@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 
 #include "../../include/train.h"
 #include "../../include/network.h"
@@ -8,51 +9,60 @@
 int main(const int argc, const char *const *const argv)
 {
 	printf(TRANSPARENT_COLOR "start." RESET_COLOR "\n");
+	srand(time(NULL));
 
 
-	const double X[3][4] = {
-		{1.0, 1.0, 0.0, 0.0},
-		{1.0, 1.0, 1.0, 1.0},
-		{0.0, 0.0, 1.0, 1.0}
+	const double X[4][2] = {
+		{0.0, 0.0},
+		{1.0, 0.0},
+		{1.0, 1.0},
+		{0.0, 1.0}
 	};
-	const uint32_t x_size = 4;
-	const uint32_t data_size = 3;
+	const uint32_t x_size = 2;
+	const uint32_t data_size = 4;
 
-	const uint32_t layers_output[] = {5, 10, 4, 7, 4};
-	const uint32_t layers_count = 5;
+	const uint32_t layers_output[] = {2, 2, 2};
+	const uint32_t layers_count = 3;
 	NeuralNetwork nn = {};
 
 	init_network(&nn, x_size, layers_count, layers_output, activation_sigmoid);
 
-	//forward_network(&nn, X[0], true, true);
-
-	//print_last_layer(&nn, true, true, true, true, true);
 	//print_network(&nn, true, true, true, true, true, true, true);
 
-	const double expected[3][4] = {
-		{0.0, 0.0, 1.0, 1.0},
-		{1.0, 1.0, 1.0, 1.0},
-		{1.0, 1.0, 0.0, 0.0}
+	const double expected[4][2] = {
+		{0.0, 0.0},
+		{0.0, 1.0},
+		{1.0, 1.0},
+		{1.0, 0.0}
 	};
 
-	for (uint32_t i = 0; i < 300'000; i++)
+	uint32_t g = 0;
+	for (uint32_t i = 0; i < 1; i++)
 	{
-		for (uint32_t j = 0; j < data_size; j++)
+		for (uint32_t k = 0; k < 100'000; k++)
 		{
-			forward_network(&nn, X[j], true, true);
-			back_propagation(&nn, expected[j]);
-			update_weights(&nn, X[j], 0.0001);
+			for (uint32_t j = 0; j < data_size; j++)
+			{
+				g = rand() % data_size;
+				forward_network(&nn, X[g]);
+				back_propagation(&nn, expected[g]);
+				update_weights(&nn, X[g], 0.4);
+			}
 		}
 	}
-	printf("\n");
-	forward_network(&nn, X[0], true, true);
-	print_last_layer(&nn, true, true, true, true, true);
-	printf("\n");
-	forward_network(&nn, X[1], true, true);
-	print_last_layer(&nn, true, true, true, true, true);
-	printf("\n");
-	forward_network(&nn, X[2], true, true);
-	print_last_layer(&nn, true, true, true, true, true);
+
+	printf(YELLOW "after train:\n" RESET_COLOR);
+	for (uint32_t i = 0; i < data_size; i++)
+	{
+		forward_network(&nn, X[i]);
+		if (i == 0)
+		{
+			printf("\n");
+			print_network(&nn, false, false, true, false, true, true, false);
+			printf("\n");
+		}
+		print_last_layer(&nn, false, false, false, false, true);
+	}
 
 	free_network(&nn);
 

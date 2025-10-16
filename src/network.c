@@ -1,19 +1,6 @@
 #include "network.h"
 
 
-void softmax(double* input, double* output, int length)
-{
-    double sum = 0.0;
-    for (int i = 0; i < length; i++) {
-        output[i] = exp(input[i]);
-        sum += output[i];
-    }
-    for (int i = 0; i < length; i++) {
-        output[i] /= sum;
-    }
-}
-
-
 void forward_layer(const double *const pInput, const uint32_t input_size, double *const *const ppWeights, const double *const pBiases, double *const pOutputs, const uint32_t output_size, PFN_activation_callback activation_callback)
 {
 	for (uint32_t i = 0; i < output_size; i++)
@@ -31,7 +18,7 @@ void forward_layer(const double *const pInput, const uint32_t input_size, double
 }
 
 
-void forward_network(NeuralNetwork *const pNetwork, const double *const pX, const bool random_fill, const bool print)
+void forward_network(NeuralNetwork *const pNetwork, const double *const pX)
 {
 	forward_layer(pX, pNetwork->inputs_size[0], pNetwork->weights[0], pNetwork->biases[0], pNetwork->outputs[0], pNetwork->outputs_size[0], pNetwork->activation_callback);
 
@@ -39,7 +26,6 @@ void forward_network(NeuralNetwork *const pNetwork, const double *const pX, cons
 	{
 		forward_layer(pNetwork->outputs[i-1], pNetwork->inputs_size[i], pNetwork->weights[i], pNetwork->biases[i], pNetwork->outputs[i], pNetwork->outputs_size[i], pNetwork->activation_callback);
 	}
-	//softmax(pNetwork->outputs[pNetwork->layers_count-1], pNetwork->outputs[pNetwork->layers_count-1], pNetwork->outputs_size[pNetwork->layers_count-1]);
 }
 
 
@@ -79,14 +65,12 @@ void init_network(NeuralNetwork *const pNetwork, const uint32_t X_size, const ui
 		for (uint32_t j = 0; j < pNetwork->outputs_size[i]; j++)
 		{
 			pNetwork->biases[i][j] = (FILL_MIN + (rand() / (RAND_MAX / (FILL_MAX - FILL_MIN))));
-			srand(rand());
 
 			pNetwork->weights[i][j] = malloc(sizeof(**pNetwork->weights) * pNetwork->inputs_size[i]);
 
 			for (uint32_t k = 0; k < pNetwork->inputs_size[i]; k++)
 			{
 				pNetwork->weights[i][j][k] = (FILL_MIN + (rand() / (RAND_MAX / (FILL_MAX - FILL_MIN))));
-				srand(rand());
 			}
 		}
 	}

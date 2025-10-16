@@ -3,7 +3,7 @@
 
 void activation_sigmoid(double *const x)
 {
-	*x = 1 / (1 + exp(-*x));
+	*x = 1.0 / (1.0 + exp(-*x));
 }
 
 
