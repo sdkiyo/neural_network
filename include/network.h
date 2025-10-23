@@ -33,8 +33,6 @@ void activation_sigmoid(double *const x);
 
 void activation_ReLU(double *const x);
 
-void forward_layer(const double *const pInput, const uint32_t input_size, double *const *const ppWeights, const double *const pBiases, double *const pOutputs, const uint32_t output_size, PFN_activation_callback activation_callback);
-
 void forward_network(NeuralNetwork *const pNetwork, const double *const pX);
 
 void init_network(NeuralNetwork *const pNetwork, const uint32_t X_size, const uint32_t layers_count, const uint32_t *const pLayers_output_size, PFN_activation_callback activation_callback);

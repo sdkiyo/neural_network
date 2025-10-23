@@ -1,30 +1,37 @@
 #include "network.h"
 
 
-void forward_layer(const double *const pInput, const uint32_t input_size, double *const *const ppWeights, const double *const pBiases, double *const pOutputs, const uint32_t output_size, PFN_activation_callback activation_callback)
+void dot_product(double *const out, const uint32_t size, const double *const m1, const double *const m2)
 {
-	for (uint32_t i = 0; i < output_size; i++)
+	*out = 0.0;
+	for (uint32_t i = 0; i < size; i++)
 	{
-		pOutputs[i] = 0.0;
-		for (uint32_t j = 0; j < input_size; j++)
-		{
-			pOutputs[i] += pInput[j] * ppWeights[i][j];
-		}
-
-		pOutputs[i] += pBiases[i];
-
-		activation_callback(&pOutputs[i]);
+		*out += m1[i] * m2[i];
 	}
 }
 
 
 void forward_network(NeuralNetwork *const pNetwork, const double *const pX)
 {
-	forward_layer(pX, pNetwork->inputs_size[0], pNetwork->weights[0], pNetwork->biases[0], pNetwork->outputs[0], pNetwork->outputs_size[0], pNetwork->activation_callback);
+	for (uint32_t i = 0; i < pNetwork->outputs_size[0]; i++)
+	{
+		dot_product(&pNetwork->outputs[0][i], pNetwork->inputs_size[0], pX, pNetwork->weights[0][i]);
+
+		pNetwork->outputs[0][i] += pNetwork->biases[0][i];
+
+		pNetwork->activation_callback(&pNetwork->outputs[0][i]);
+	}
 
 	for (uint32_t i = 1; i < pNetwork->layers_count; i++)
 	{
-		forward_layer(pNetwork->outputs[i-1], pNetwork->inputs_size[i], pNetwork->weights[i], pNetwork->biases[i], pNetwork->outputs[i], pNetwork->outputs_size[i], pNetwork->activation_callback);
+		for (uint32_t j = 0; j < pNetwork->outputs_size[i]; j++)
+		{
+			dot_product(&pNetwork->outputs[i][j], pNetwork->inputs_size[i], pNetwork->outputs[i - 1], pNetwork->weights[i][j]);
+
+			pNetwork->outputs[i][j] += pNetwork->biases[i][j];
+
+			pNetwork->activation_callback(&pNetwork->outputs[i][j]);
+		}
 	}
 }
 
@@ -51,7 +58,7 @@ void init_network(NeuralNetwork *const pNetwork, const uint32_t X_size, const ui
 		}
 		else
 		{
-			pNetwork->inputs_size[i] = pLayers_output_size[i-1];
+			pNetwork->inputs_size[i] = pLayers_output_size[i - 1];
 		}
 
 		pNetwork->outputs_size[i] = pLayers_output_size[i];

@@ -39,7 +39,7 @@ int main(const int argc, const char *const *const argv)
 	uint32_t g = 0;
 	for (uint32_t i = 0; i < 1; i++)
 	{
-		for (uint32_t k = 0; k < 100'000; k++)
+		for (uint32_t k = 0; k < 1'000; k++)
 		{
 			for (uint32_t j = 0; j < data_size; j++)
 			{
@@ -58,7 +58,7 @@ int main(const int argc, const char *const *const argv)
 		if (i == 0)
 		{
 			printf("\n");
-			print_network(&nn, false, false, true, false, true, true, false);
+			print_network(&nn, false, false, true, false, true, true, true);
 			printf("\n");
 		}
 		print_last_layer(&nn, false, false, false, false, true);
