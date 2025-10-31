@@ -15,7 +15,10 @@
 #define FILL_MAX 0.10
 
 
-typedef void (*PFN_activation_callback)(double *const x);
+typedef void (*PFN_activation_callback)(double *const);
+typedef double (*PFN_derivative_callback)(const double);
+typedef double (*PFN_loss_callback)(const double, const double);
+
 
 typedef struct NeuralNetwork {
 	double ***weights;
@@ -25,21 +28,17 @@ typedef struct NeuralNetwork {
 	uint32_t *inputs_size;
 	uint32_t *outputs_size;
 	PFN_activation_callback activation_callback;
+	PFN_derivative_callback derivative_callback;
+	PFN_loss_callback loss_callback;
 	uint32_t layers_count;
 } NeuralNetwork;
 
 
-void activation_sigmoid(double *const x);
+typedef void (*PFN_forward_network)(NeuralNetwork *const pNetwork, const double *const pX);
+typedef void (*PFN_init_network)(NeuralNetwork *const pNetwork, const uint32_t X_size, const uint32_t layers_count, const uint32_t *const pLayers_output_size, PFN_activation_callback activation_callback, PFN_derivative_callback derivative_callback, PFN_loss_callback loss_callback);
+typedef void (*PFN_free_network)(NeuralNetwork *const pNetwork);
+typedef void (*PFN_clear_network)(NeuralNetwork *const pNetwork);
 
-void activation_ReLU(double *const x);
-
-void forward_network(NeuralNetwork *const pNetwork, const double *const pX);
-
-void init_network(NeuralNetwork *const pNetwork, const uint32_t X_size, const uint32_t layers_count, const uint32_t *const pLayers_output_size, PFN_activation_callback activation_callback);
-
-void free_network(NeuralNetwork *const pNetwork);
-
-void clear_network(NeuralNetwork *const pNetwork);
 
 
 #endif

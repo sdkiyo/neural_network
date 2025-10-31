@@ -1,10 +1,9 @@
-#include "network.h"
+#include <math.h>
 
 
 void activation_sigmoid(double *const x)
 {
-	//*x = 1.0 / (1.0 + exp(-*x));
-	*x = tanh(*x);
+	*x = 1.0 / (1.0 + exp(-*x));
 }
 
 

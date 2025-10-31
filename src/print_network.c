@@ -86,18 +86,7 @@ void print_network(NeuralNetwork *const pNetwork, const bool showLayersCount, co
 
 	if (showActivationFunction == true)
 	{
-		if (pNetwork->activation_callback == activation_sigmoid)
-		{
-			printf("activation: sigmoid\n");
-		}
-		else if (pNetwork->activation_callback == activation_ReLU)
-		{
-			printf("activation: ReLU\n");
-		}
-		else
-		{
 			printf("activation: unknown\n");
-		}
 	}
 
 	for (uint32_t i = 0; i < pNetwork->layers_count; i++)

@@ -1,24 +1,11 @@
 #include "train.h"
 
 
-double relu_derivative(const double output)
-{
-	return output > 0 ? 1 : 0;
-}
-
-
-double sigmoid_derivative(const double output)
-{
-	//return output * (1.0 - output);
-	return 1.0 - output * output;
-}
-
-
 void back_propagation(NeuralNetwork *const pNetwork, const double *const expected)
 {
 	for (uint32_t j = 0; j < pNetwork->outputs_size[pNetwork->layers_count - 1]; j++)
 	{
-		pNetwork->errors[pNetwork->layers_count - 1][j] = (pNetwork->outputs[pNetwork->layers_count - 1][j] - expected[j]) * sigmoid_derivative(pNetwork->outputs[pNetwork->layers_count - 1][j]);
+		pNetwork->errors[pNetwork->layers_count - 1][j] = pNetwork->loss_callback(pNetwork->outputs[pNetwork->layers_count - 1][j], expected[j]) * pNetwork->derivative_callback(pNetwork->outputs[pNetwork->layers_count - 1][j]);
 	}
 
 	for (int i = (pNetwork->layers_count - 2); i >= 0; i--)
@@ -35,7 +22,7 @@ void back_propagation(NeuralNetwork *const pNetwork, const double *const expecte
 				}
 			}
 
-			pNetwork->errors[i][j] *= sigmoid_derivative(pNetwork->outputs[i][j]);
+			pNetwork->errors[i][j] *= pNetwork->derivative_callback(pNetwork->outputs[i][j]);
 		}
 	}
 }
